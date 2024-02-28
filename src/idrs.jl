@@ -112,8 +112,6 @@ end
 function idrs_iterable!(log, X, A, C::T,
     s::Number, Pl::precT, abstol::Real, reltol::Real, maxiter::Number; smoothing::Bool=false, verbose::Bool=false
     ) where {T, precT}
-
-    verbose && @printf("============== idrs ==============\n%4s\t%9s\t%9s\n", "iter", "resnorm", "relresn")
     R = C - A*X
     normR = norm(R)
     tol = max(reltol * normR, abstol)
@@ -180,11 +178,6 @@ function iterate(it::IDRSIterable, (iter, step) = (1, 1))
             for i in 1:s
                 f[i] = dot(P[i], R)
             end
-    om::eltype(C) = 1
-    resnorm0 = normR
-    while normR > tol && iter ≤ maxiter
-        for i in 1:s
-            f[i] = dot(P[i], R)
         end
         k = step
 
@@ -241,18 +234,6 @@ function iterate(it::IDRSIterable, (iter, step) = (1, 1))
         end
         if k < s
             f[k+1:s] .-= beta*M[k+1:s,k]
-                normR = norm(R_s)
-            end
-            push!(log, :resnorm, normR)
-            verbose && @printf("%3d\t%1.4e\t%1.4e\n", iter, normR, normR/resnorm0)
-            if normR < tol || iter == maxiter
-                setconv(log, 0<=normR<tol)
-                return X
-            end
-            if k < s
-                f[k+1:s] .-=  beta*M[k+1:s,k]
-            end
-            iter += 1
         end
         nextstep = step + 1
     elseif step == s + 1
