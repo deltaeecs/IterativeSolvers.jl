@@ -1,7 +1,7 @@
 export lsqr, lsqr!
 
 """
-    lsqr(A, b; kwrags...) -> x, [history]
+    lsqr(A, b; kwargs...) -> x, [history]
 
 Same as [`lsqr!`](@ref), but allocates a solution vector `x` initialized with zeros.
 """
@@ -98,9 +98,11 @@ function lsqr_method!(log::ConvergenceHistory, x, A, b;
     n = size(A,2)
     length(x) == n || error("x should be of length ", n)
     length(b) == m || error("b should be of length ", m)
-    for i = 1:n
-        isfinite(x[i]) || error("Initial guess for x must be finite")
+    
+    if !(all(isfinite.(x)))
+      error("Initial guess for x must be finite")
     end
+
 
     # Initialize
     T = Adivtype(A, b)
